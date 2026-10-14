@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GesturePlay AI — Real-Time Hand Gesture Game Controller & Interactive Web Lab</title>
+  <meta name="description" content="AI-based touchless hand gesture recognition system for gaming. Play PC games and browser games using only your webcam and hand gestures.">
+  <meta name="author" content="A karthick (karthick0328-design)">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>">
+
+  <!-- Google Fonts: Outfit & Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <!-- MediaPipe Hands & Camera Utils CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+
+  <!-- Application Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="cyber-grid"></div>
+
+  <!-- Top Navigation -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="#" class="brand">
+        <div class="brand-icon">
+          <i class="bi bi-controller"></i>
+        </div>
+        <span>GesturePlay<strong>.AI</strong></span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="#playground" class="nav-link"><i class="bi bi-play-circle"></i> Live Demo</a></li>
+        <li><a href="#gestures" class="nav-link"><i class="bi bi-hand-index-thumb"></i> Gestures</a></li>
+        <li><a href="#architecture" class="nav-link"><i class="bi bi-cpu"></i> Pipeline</a></li>
+        <li><a href="#desktop" class="nav-link"><i class="bi bi-terminal"></i> Desktop Setup</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <a href="https://github.com/karthick0328-design/GesturePlay-AI" target="_blank" rel="noopener" class="btn btn-outline btn-sm">
+          <i class="bi bi-github"></i>
+          <span>GitHub</span>
+        </a>
+        <a href="#playground" class="btn btn-accent btn-sm">
+          <i class="bi bi-webcam"></i>
+          <span>Try Webcam</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <main>
+    <section class="hero">
+      <div class="container hero-content">
+        <div class="badge badge-live">
+          <span class="badge-pulse"></span>
+          <span>MediaPipe Computer Vision &bull; Touchless Control Engine</span>
+        </div>
+
+        <h1 class="hero-title">
+          Control Games With Your Hands.<br>
+          <span class="hero-title-gradient">No Keyboard. No Controller.</span>
+        </h1>
+
+        <p class="hero-desc">
+          GesturePlay AI translates real-time webcam hand movements into low-latency game inputs.
+          Test it live in your browser below, or download the Python desktop engine to drive PC games like Asphalt, Need for Speed, and retro emulators.
+        </p>
+
+        <div class="hero-cta">
+          <a href="#playground" class="btn btn-accent">
+            <i class="bi bi-play-fill"></i> Launch Live Playground
+          </a>
+          <a href="#desktop" class="btn btn-outline">
+            <i class="bi bi-windows"></i> Get Desktop App (Python)
+          </a>
+        </div>
+
+        <div class="hero-stats">
+          <div class="stat-card">
+            <div class="stat-val">60 FPS</div>
+            <div class="stat-label">Real-Time Tracking</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-val">&lt; 15 ms</div>
+            <div class="stat-label">Inference Latency</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-val">DirectX</div>
+            <div class="stat-label">PC Game Compatibility</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-val">100% Client</div>
+            <div class="stat-label">Zero Cloud Overhead</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Webcam Playground & Mini Game -->
+    <section id="playground" class="playground-section">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-tag">Interactive Dual-Stage Lab</div>
+          <h2 class="section-title">Webcam Vision &amp; Cyber Racer</h2>
+          <p class="section-desc">
+            Enable your webcam on the left to see the MediaPipe geometric skeleton in action. Your detected gestures will simultaneously pilot the Cyber Racer on the right!
+          </p>
+        </div>
+
+        <div class="stage-container">
+          <!-- Stage 1: Computer Vision Feed -->
+          <div class="stage-box">
+            <div class="stage-box-header">
+              <div class="stage-title">
+                <i class="bi bi-camera-video text-info"></i>
+                <span>Vision Feed &amp; Skeleton</span>
+              </div>
+              <div class="stage-actions">
+                <button id="btn-toggle-camera" class="btn btn-outline btn-sm">
+                  <i class="bi bi-camera-fill"></i>
+                  <span id="camera-btn-text">Start Webcam</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="viewport-wrapper">
+              <video id="webcam-video" autoplay playsinline muted></video>
+              <canvas id="vision-canvas"></canvas>
+
+              <!-- Standby Overlay -->
+              <div id="camera-standby-overlay" class="camera-standby">
+                <div class="camera-standby-icon">
+                  <i class="bi bi-hand-index-thumb"></i>
+                </div>
+                <h3>Camera Offline</h3>
+                <p>Click "Start Webcam" to detect hand gestures in real time, or use the Simulator buttons below.</p>
+                <button id="btn-start-camera-hero" class="btn btn-primary">
+                  <i class="bi bi-camera-video-fill"></i> Enable Camera
+                </button>
+              </div>
+
+              <!-- Real-time HUD -->
+              <div class="vision-hud">
+                <div class="hud-pill" id="vision-status-pill">
+                  <span class="badge-pulse" style="background:#64748b; animation:none;"></span>
+                  <span id="vision-status-text">OFFLINE</span>
+                </div>
+                <div class="hud-pill hud-pill-accent">
+                  <i class="bi bi-speedometer2"></i>
+                  <span id="vision-fps">0 FPS</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stage 2: Cyber Racer Canvas -->
+          <div class="stage-box">
+            <div class="stage-box-header">
+              <div class="stage-title">
+                <i class="bi bi-joystick text-warning"></i>
+                <span>Cyber Racer Mini-Game</span>
+              </div>
+              <div class="stage-actions">
+                <span class="hud-pill">
+                  <i class="bi bi-trophy"></i>
+                  <span>Hi: <strong id="game-highscore">0</strong></span>
+                </span>
+              </div>
+            </div>
+
+            <div class="game-viewport">
+              <canvas id="game-canvas"></canvas>
+
+              <!-- Game Start / Game Over Overlay -->
+              <div id="game-start-overlay" class="game-overlay-screen">
+                <h3>CYBER RACER</h3>
+                <p>Use your hand gestures or keyboard arrows to steer, accelerate, and shield your ship!</p>
+                <button id="btn-start-game" class="btn btn-accent">
+                  <i class="bi bi-play-fill"></i> Start Game
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Telemetry Dock -->
+          <div class="telemetry-dock">
+            <div class="telemetry-item">
+              <span class="telemetry-label">Detected Gesture</span>
+              <div class="telemetry-val" style="color: #38bdf8;" id="telemetry-gesture">NO_HAND</div>
+            </div>
+
+            <div class="telemetry-item">
+              <span class="telemetry-label">Active Simulated Key</span>
+              <div class="telemetry-val" id="telemetry-keys">
+                <span class="key-keycap" id="keycap-w">W</span>
+                <span class="key-keycap" id="keycap-a">A</span>
+                <span class="key-keycap" id="keycap-s">S</span>
+                <span class="key-keycap" id="keycap-d">D</span>
+                <span class="key-keycap" id="keycap-space">SPC</span>
+              </div>
+            </div>
+
+            <div class="telemetry-item">
+              <span class="telemetry-label">Tilt Angle &amp; Orientation</span>
+              <div class="telemetry-val" id="telemetry-angle">0&deg; / NONE</div>
+            </div>
+
+            <div class="telemetry-item">
+              <span class="telemetry-label">Profile</span>
+              <div class="telemetry-val">
+                <select id="profile-select" style="background:#1e293b; color:#fff; border:1px solid rgba(255,255,255,0.2); padding:0.25rem 0.6rem; border-radius:6px; font-size:0.85rem; font-family:var(--font-mono); outline:none;">
+                  <option value="racing" selected>Racing (WASD + Space)</option>
+                  <option value="platformer">Platformer (Arrow Keys)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Simulator Quick Trigger Bar -->
+          <div style="grid-column: 1 / -1; display:flex; align-items:center; justify-content:center; gap:0.75rem; flex-wrap:wrap; padding-top:0.5rem;">
+            <span style="font-size:0.8rem; color:var(--text-dim); text-transform:uppercase; font-weight:700;">Manual Trigger Test:</span>
+            <button class="btn btn-outline btn-sm sim-gesture-btn" data-gesture="OPEN_PALM">🖐️ Open Palm (W)</button>
+            <button class="btn btn-outline btn-sm sim-gesture-btn" data-gesture="FIST">✊ Fist (S)</button>
+            <button class="btn btn-outline btn-sm sim-gesture-btn" data-gesture="PALM_LEFT">👈 Tilt Left (A)</button>
+            <button class="btn btn-outline btn-sm sim-gesture-btn" data-gesture="PALM_RIGHT">👉 Tilt Right (D)</button>
+            <button class="btn btn-outline btn-sm sim-gesture-btn" data-gesture="TWO_FINGERS">✌️ Two Fingers (Space)</button>
+            <button class="btn btn-outline btn-sm sim-gesture-btn" data-gesture="NO_HAND">Release Keys</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Gesture Mapping Showcase -->
+    <section id="gestures" style="padding: 4rem 0;">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-tag">Geometric Recognition Rules</div>
+          <h2 class="section-title">Supported Gestures &amp; Key Mappings</h2>
+          <p class="section-desc">
+            GesturePlay AI uses normalized Euclidean finger extension ratios and vector angle heuristics for 100% deterministic, instant gesture detection.
+          </p>
+        </div>
+
+        <div class="gestures-grid">
+          <div class="gesture-card">
+            <div class="gesture-icon-wrap">🖐️</div>
+            <div class="gesture-name">
+              <span>OPEN PALM</span>
+              <span class="gesture-action-tag">Key [ W ]</span>
+            </div>
+            <p class="gesture-desc">All 5 fingers extended. Triggers full throttle acceleration in racing games or forward movement in FPS titles.</p>
+            <div class="gesture-meta">
+              <span>Rule: ext_count == 5</span>
+              <span>Action: Accelerate</span>
+            </div>
+          </div>
+
+          <div class="gesture-card">
+            <div class="gesture-icon-wrap">✊</div>
+            <div class="gesture-name">
+              <span>CLOSED FIST</span>
+              <span class="gesture-action-tag">Key [ S ]</span>
+            </div>
+            <p class="gesture-desc">All fingertips curled into the palm. Triggers emergency braking, reverse drive, or crouch/shield mechanics.</p>
+            <div class="gesture-meta">
+              <span>Rule: ext_count &le; 1</span>
+              <span>Action: Brake / Shield</span>
+            </div>
+          </div>
+
+          <div class="gesture-card">
+            <div class="gesture-icon-wrap">👈</div>
+            <div class="gesture-name">
+              <span>TILT LEFT</span>
+              <span class="gesture-action-tag">Key [ A ]</span>
+            </div>
+            <p class="gesture-desc">Hand tilted toward the left (-120&deg; to 120&deg; vector angle). Smoothly turns vehicle left without touch.</p>
+            <div class="gesture-meta">
+              <span>Rule: angle &gt; 120&deg;</span>
+              <span>Action: Steer Left</span>
+            </div>
+          </div>
+
+          <div class="gesture-card">
+            <div class="gesture-icon-wrap">👉</div>
+            <div class="gesture-name">
+              <span>TILT RIGHT</span>
+              <span class="gesture-action-tag">Key [ D ]</span>
+            </div>
+            <p class="gesture-desc">Hand tilted toward the right (-60&deg; to 60&deg; vector angle). Smoothly steers vehicle to the right.</p>
+            <div class="gesture-meta">
+              <span>Rule: -60&deg; &le; angle &le; 60&deg;</span>
+              <span>Action: Steer Right</span>
+            </div>
+          </div>
+
+          <div class="gesture-card">
+            <div class="gesture-icon-wrap">✌️</div>
+            <div class="gesture-name">
+              <span>TWO FINGERS</span>
+              <span class="gesture-action-tag">Key [ SPACE ]</span>
+            </div>
+            <p class="gesture-desc">Index and middle finger extended (Peace sign). Activates nitrous boost, emergency handbrake, or jump.</p>
+            <div class="gesture-meta">
+              <span>Rule: index &amp;&amp; middle</span>
+              <span>Action: Jump / Nitro</span>
+            </div>
+          </div>
+
+          <div class="gesture-card">
+            <div class="gesture-icon-wrap">🛡️</div>
+            <div class="gesture-name">
+              <span>SAFE RELEASE</span>
+              <span class="gesture-action-tag">Keys Up</span>
+            </div>
+            <p class="gesture-desc">When your hand exits the camera frame, GesturePlay automatically releases all held keys to prevent sticky key spamming.</p>
+            <div class="gesture-meta">
+              <span>Safety: Auto-debounce</span>
+              <span>Action: Release All</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pipeline Architecture -->
+    <section id="architecture" style="padding: 4rem 0; background: rgba(13, 19, 31, 0.4);">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-tag">Under The Hood</div>
+          <h2 class="section-title">Computer Vision Pipeline</h2>
+          <p class="section-desc">
+            How a frame from your webcam transforms into an operating system keyboard stroke in under 15 milliseconds.
+          </p>
+        </div>
+
+        <div class="pipeline-track">
+          <div class="pipeline-step">
+            <div class="step-num">STAGE 01</div>
+            <h4 class="step-title">Frame Acquisition</h4>
+            <p class="step-desc">OpenCV captures raw 60 FPS video from the user's webcam, flips horizontally for natural mirror feel, and converts to RGB.</p>
+          </div>
+          <div class="pipeline-arrow"><i class="bi bi-chevron-right"></i></div>
+
+          <div class="pipeline-step">
+            <div class="step-num">STAGE 02</div>
+            <h4 class="step-title">MediaPipe 3D Mesh</h4>
+            <p class="step-desc">Extracts 21 3D hand coordinates (wrist, knuckles, MCPs, fingertips) with sub-pixel landmark precision.</p>
+          </div>
+          <div class="pipeline-arrow"><i class="bi bi-chevron-right"></i></div>
+
+          <div class="pipeline-step">
+            <div class="step-num">STAGE 03</div>
+            <h4 class="step-title">Geometric Normalization</h4>
+            <p class="step-desc">Computes Euclidean distance ratios and atan2 angles relative to palm bounding box, making detection distance-independent.</p>
+          </div>
+          <div class="pipeline-arrow"><i class="bi bi-chevron-right"></i></div>
+
+          <div class="pipeline-step">
+            <div class="step-num">STAGE 04</div>
+            <h4 class="step-title">Temporal Debounce</h4>
+            <p class="step-desc">Stabilizes noisy transitions through a 4-frame FIFO buffer, eliminating jitter and rapid key repeat bugs.</p>
+          </div>
+          <div class="pipeline-arrow"><i class="bi bi-chevron-right"></i></div>
+
+          <div class="pipeline-step">
+            <div class="step-num">STAGE 05</div>
+            <h4 class="step-title">DirectX Automation</h4>
+            <p class="step-desc">ActionMapper executes scan-code keypresses via PyDirectInput, sending hardware-level keystrokes directly into PC games.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Desktop Setup & PC Game Execution -->
+    <section id="desktop" style="padding: 4rem 0;">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-tag">PC Gaming Installation</div>
+          <h2 class="section-title">Run Native Desktop Controller</h2>
+          <p class="section-desc">
+            To control games running on your PC (Steam, Xbox App, Epic Games, Emulators), run the Python desktop app locally.
+          </p>
+        </div>
+
+        <div class="code-container">
+          <div class="code-header">
+            <span><i class="bi bi-terminal-fill me-2"></i>Windows Terminal / PowerShell</span>
+            <button id="btn-copy-code" class="btn btn-outline btn-sm">
+              <i class="bi bi-clipboard"></i> Copy Commands
+            </button>
+          </div>
+          <pre class="code-body"><code id="code-setup-instructions"><span class="code-comment"># 1. Clone the repository</span>
+<span class="code-cmd">git clone https://github.com/karthick0328-design/GesturePlay-AI.git</span>
+<span class="code-cmd">cd GesturePlay-AI</span>
+
+<span class="code-comment"># 2. Install Python dependencies</span>
+<span class="code-cmd">pip install -r requirements.txt</span>
+
+<span class="code-comment"># 3. Launch the GesturePlay AI Controller</span>
+<span class="code-cmd">python app/main.py</span></code></pre>
+        </div>
+
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>Web Lab (Vercel)</th>
+              <th>Desktop Controller (Python)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Primary Target</strong></td>
+              <td>Browser Games, Demos &amp; Testing</td>
+              <td>Native PC Games (Asphalt, Forza, Emulators)</td>
+            </tr>
+            <tr>
+              <td><strong>Installation</strong></td>
+              <td>Zero install &bull; Instant URL access</td>
+              <td>Python 3.11+ with requirements.txt</td>
+            </tr>
+            <tr>
+              <td><strong>Keystroke Injection</strong></td>
+              <td>In-browser DOM events</td>
+              <td>DirectX Scan-Code Input (`pydirectinput`)</td>
+            </tr>
+            <tr>
+              <td><strong>Custom Profiles</strong></td>
+              <td>Racing &amp; Platformer</td>
+              <td>Configurable JSON mappings &amp; Calibrator</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <div class="brand">
+        <div class="brand-icon">
+          <i class="bi bi-controller"></i>
+        </div>
+        <span>GesturePlay<strong>.AI</strong></span>
+      </div>
+
+      <ul class="footer-links">
+        <li><a href="https://github.com/karthick0328-design/GesturePlay-AI" target="_blank" rel="noopener"><i class="bi bi-github"></i> GitHub Repository</a></li>
+        <li><a href="https://github.com/karthick0328-design" target="_blank" rel="noopener"><i class="bi bi-person-circle"></i> Karthick's GitHub Profile</a></li>
+      </ul>
+
+      <p class="footer-copy">
+        Created by <strong>A karthick</strong> (<a href="https://github.com/karthick0328-design" target="_blank" rel="noopener">karthick0328-design</a>). Open Source under MIT License.
+      </p>
+    </div>
+  </footer>
+
+  <!-- Toast notification element -->
+  <div id="toast" class="toast-notice">
+    <i class="bi bi-check-circle-fill text-success"></i>
+    <span id="toast-msg">Copied to clipboard!</span>
+  </div>
+
+  <!-- Main Web Logic -->
+  <script src="js/gesture-tracker.js"></script>
+  <script src="js/game.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Initialize Cyber Racer Mini-Game
+      const game = new CyberRacerGame('game-canvas');
+      const startOverlayBtn = document.getElementById('btn-start-game');
+      if (startOverlayBtn) {
+        startOverlayBtn.addEventListener('click', () => game.start());
+      }
+
+      // Update High Score badge
+      const hsBadge = document.getElementById('game-highscore');
+      if (hsBadge) hsBadge.innerText = game.highScore;
+
+      // 2. Initialize Gesture Tracker
+      const tracker = new BrowserGestureTracker({
+        videoElement: document.getElementById('webcam-video'),
+        canvasElement: document.getElementById('vision-canvas'),
+        onGestureDetected: (gesture, analysis) => {
+          game.handleGesture(gesture);
+        },
+        onTelemetryUpdate: (data) => {
+          // Update Telemetry Elements
+          const gestureEl = document.getElementById('telemetry-gesture');
+          if (gestureEl) gestureEl.innerText = data.gesture;
+
+          const angleEl = document.getElementById('telemetry-angle');
+          if (angleEl) {
+            angleEl.innerText = `${data.angle}° / ${data.orientation}`;
+          }
+
+          const fpsEl = document.getElementById('vision-fps');
+          if (fpsEl) fpsEl.innerText = `${data.fps} FPS`;
+
+          const statusText = document.getElementById('vision-status-text');
+          const statusPill = document.getElementById('vision-status-pill');
+          if (data.handDetected) {
+            if (statusText) statusText.innerText = 'TRACKING';
+            if (statusPill) statusPill.style.borderColor = '#10b981';
+          } else if (tracker.isRunning) {
+            if (statusText) statusText.innerText = 'LOOKING FOR HAND';
+            if (statusPill) statusPill.style.borderColor = '#f59e0b';
+          }
+        }
+      });
+
+      // 3. Camera toggle handlers
+      const toggleCamBtn = document.getElementById('btn-toggle-camera');
+      const heroCamBtn = document.getElementById('btn-start-camera-hero');
+      const standbyOverlay = document.getElementById('camera-standby-overlay');
+      const camBtnText = document.getElementById('camera-btn-text');
+      const videoEl = document.getElementById('webcam-video');
+
+      async function toggleCamera() {
+        if (!tracker.isRunning) {
+          try {
+            if (camBtnText) camBtnText.innerText = 'Connecting...';
+            await tracker.startCamera();
+            if (standbyOverlay) standbyOverlay.style.display = 'none';
+            if (videoEl) videoEl.style.display = 'block';
+            if (camBtnText) camBtnText.innerText = 'Stop Webcam';
+            toggleCamBtn.classList.remove('btn-outline');
+            toggleCamBtn.classList.add('btn-accent');
+            showToast('Webcam connected! Show your hand to control the game.');
+          } catch (err) {
+            console.error('Camera failed:', err);
+            alert('Could not access webcam. Please ensure your browser has camera permission.');
+            if (camBtnText) camBtnText.innerText = 'Start Webcam';
+          }
+        } else {
+          tracker.stopCamera();
+          if (standbyOverlay) standbyOverlay.style.display = 'flex';
+          if (videoEl) videoEl.style.display = 'none';
+          if (camBtnText) camBtnText.innerText = 'Start Webcam';
+          toggleCamBtn.classList.remove('btn-accent');
+          toggleCamBtn.classList.add('btn-outline');
+          const statusText = document.getElementById('vision-status-text');
+          if (statusText) statusText.innerText = 'OFFLINE';
+        }
+      }
+
+      if (toggleCamBtn) toggleCamBtn.addEventListener('click', toggleCamera);
+      if (heroCamBtn) heroCamBtn.addEventListener('click', toggleCamera);
+
+      // 4. Simulator buttons for manual testing without camera
+      document.querySelectorAll('.sim-gesture-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const gesture = btn.getAttribute('data-gesture');
+          game.handleGesture(gesture);
+          const gestureEl = document.getElementById('telemetry-gesture');
+          if (gestureEl) gestureEl.innerText = `${gesture} (SIM)`;
+          showToast(`Triggered gesture: ${gesture}`);
+        });
+      });
+
+      // 5. Copy code instructions
+      const copyBtn = document.getElementById('btn-copy-code');
+      if (copyBtn) {
+        copyBtn.addEventListener('click', () => {
+          const code = document.getElementById('code-setup-instructions').innerText;
+          navigator.clipboard.writeText(code).then(() => {
+            showToast('Commands copied to clipboard!');
+          });
+        });
+      }
+
+      // Toast helper
+      function showToast(msg) {
+        const toast = document.getElementById('toast');
+        const toastMsg = document.getElementById('toast-msg');
+        if (toast && toastMsg) {
+          toastMsg.innerText = msg;
+          toast.classList.add('show');
+          setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+      }
+    });
+  </script>
+</body>
+</html>

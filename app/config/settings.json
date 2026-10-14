@@ -1,0 +1,53 @@
+{
+  "active_profile": "racing",
+  "profiles": {
+    "racing": {
+      "gestures": {
+        "OPEN_PALM": "Accelerate",
+        "FIST": "Brake",
+        "PALM_LEFT": "Left",
+        "PALM_RIGHT": "Right",
+        "TWO_FINGERS": "Jump"
+      },
+      "keys": {
+        "Accelerate": "right",
+        "Brake": "left",
+        "Left": "left",
+        "Right": "right",
+        "Jump": "space"
+      }
+    },
+    "platformer": {
+      "gestures": {
+        "OPEN_PALM": "Right",
+        "FIST": "Left",
+        "PALM_LEFT": "Duck",
+        "PALM_RIGHT": "Right",
+        "TWO_FINGERS": "Jump"
+      },
+      "keys": {
+        "Right": "d",
+        "Left": "a",
+        "Duck": "s",
+        "Jump": "space"
+      }
+    },
+    "custom": {
+      "gestures": {
+        "OPEN_PALM": "Action1",
+        "FIST": "Action2",
+        "PALM_LEFT": "Action3",
+        "PALM_RIGHT": "Action4",
+        "TWO_FINGERS": "Action5"
+      },
+      "keys": {
+        "Action1": "w",
+        "Action2": "s",
+        "Action3": "a",
+        "Action4": "d",
+        "Action5": "space"
+      }
+    }
+  },
+  "reference_hand_size": 0.15
+}
