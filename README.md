@@ -91,7 +91,7 @@ git clone https://github.com/karthick0328-design/GesturePlay-AI.git
 cd GesturePlay-AI
 
 # 2. Install dependencies
-pip install -r requirements.txt
+pip install -r app/requirements.txt
 
 # 3. Launch controller
 python app/main.py
@@ -111,7 +111,8 @@ python validate_pipeline.py
 ```text
 GesturePlay-AI/
 ├── index.html              # Modern Web Lab & Cyber Racer Mini-Game (Vercel entrypoint)
-├── vercel.json             # Vercel deployment configuration
+├── vercel.json             # Vercel static deployment configuration
+├── .vercelignore           # Excludes desktop Python backend from Vercel
 ├── css/
 │   └── style.css           # Cyber-glassmorphism dark UI styling
 ├── js/
@@ -119,13 +120,13 @@ GesturePlay-AI/
 │   └── game.js             # 60 FPS HTML5 Canvas Cyber Racer game
 ├── app/
 │   ├── main.py             # Desktop controller entry point
+│   ├── requirements.txt    # Python desktop dependencies
 │   ├── camera/             # Video capture & frame preprocessing
 │   ├── vision/             # MediaPipe tracking & gesture classification
 │   ├── control/            # PyDirectInput keyboard automation
 │   ├── profiles/           # Racing & Platformer key mappings
 │   ├── calibration/        # Distance & scale sensitivity tuner
 │   └── ui/                 # OpenCV dashboard overlay & settings window
-├── requirements.txt        # Python desktop dependencies
 ├── validate_pipeline.py    # Offline unit and integration test suite
 └── README.md
 ```
