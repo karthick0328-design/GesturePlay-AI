@@ -1,0 +1,10 @@
+# Ignore Python desktop app files from Vercel Serverless build
+app/
+tests/
+validate_pipeline.py
+requirements.txt
+logs/
+*.py
+*.pyc
+__pycache__/
+.pytest_cache/
